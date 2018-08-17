@@ -1,7 +1,7 @@
 package com.basstype.androidphoenixdemo;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,11 +11,16 @@ import android.widget.TextView;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.phoenixframework.channels.*;
+
+import org.phoenixframework.channels.Channel;
+import org.phoenixframework.channels.Envelope;
+import org.phoenixframework.channels.IErrorCallback;
+import org.phoenixframework.channels.IMessageCallback;
+import org.phoenixframework.channels.Socket;
 
 import java.io.IOException;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -23,10 +28,10 @@ public class MainActivity extends AppCompatActivity {
     Socket socket;
     Channel channel;
 
-    @Bind(R.id.messages)
+    @BindView(R.id.messages)
     TextView messages;
 
-    @Bind(R.id.message_box)
+    @BindView(R.id.message_box)
     EditText messageBox;
 
 
@@ -67,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
                     String user = envelope.getPayload().get("user").asText();
 
-                    if(user == null || user.isEmpty() || user.equalsIgnoreCase("null")){
+                    if (user == null || user.isEmpty() || user.equalsIgnoreCase("null")) {
                         user = "anonymous";
                     }
 
@@ -77,19 +82,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            channel.onClose(new IMessageCallback() {
-                @Override
-                public void onMessage(Envelope envelope) {
-                    Log.d(MainActivity.class.getName(), "Channel Closed");
-                }
-            });
+//            channel.onClose(new IMessageCallback() {
+//                @Override
+//                public void onMessage(Envelope envelope) {
+//                    Log.d(MainActivity.class.getName(), "Channel Closed");
+//                }
+//            });
 
-            channel.onError(new IErrorCallback() {
-                @Override
-                public void onError(String reason) {
-                    Log.d(MainActivity.class.getName(), reason);
-                }
-            });
+//            channel.onError(new IErrorCallback() {
+//                @Override
+//                public void onError(String reason) {
+//                    Log.d(MainActivity.class.getName(), reason);
+//                }
+//            });
 
         } catch (IOException e) {
 
@@ -98,10 +103,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     @OnClick(R.id.send_chat)
-    public void onSendChatClicked(View v){
+    public void onSendChatClicked(View v) {
         String message = messageBox.getText().toString();
 
-        if (!message.isEmpty()){
+        if (!message.isEmpty()) {
             try {
                 ObjectNode node = new ObjectNode(JsonNodeFactory.instance)
                         .put("user", "Android")
@@ -109,13 +114,13 @@ public class MainActivity extends AppCompatActivity {
 
                 channel.push("new:msg", node);
                 messageBox.setText("");
-            }catch (IOException e){
+            } catch (IOException e) {
 
             }
         }
     }
 
-    public void updateMessages(final String message){
+    public void updateMessages(final String message) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -127,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void updateMessages(final String user, final String message){
+    public void updateMessages(final String user, final String message) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
