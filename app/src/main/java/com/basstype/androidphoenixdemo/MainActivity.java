@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.phoenixframework.channels.Channel;
 import org.phoenixframework.channels.Envelope;
-import org.phoenixframework.channels.IErrorCallback;
 import org.phoenixframework.channels.IMessageCallback;
 import org.phoenixframework.channels.Socket;
 
@@ -107,16 +106,23 @@ public class MainActivity extends AppCompatActivity {
         String message = messageBox.getText().toString();
 
         if (!message.isEmpty()) {
-            try {
-                ObjectNode node = new ObjectNode(JsonNodeFactory.instance)
-                        .put("user", "Android")
-                        .put("body", message);
 
-                channel.push("new:msg", node);
-                messageBox.setText("");
-            } catch (IOException e) {
+            ObjectNode node = new ObjectNode(JsonNodeFactory.instance)
+                    .put("user", "Android")
+                    .put("body", message);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        channel.push("new:msg", node);
+                    } catch (IOException e) {
 
-            }
+                    }
+                }
+            }).start();
+
+            messageBox.setText("");
+
         }
     }
 
